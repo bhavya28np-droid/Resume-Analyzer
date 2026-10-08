@@ -64,7 +64,9 @@ def find_skills(text):
     lower_text = text.lower()
 
     for skill in SKILLS:
-        if skill.lower() in lower_text:
+        pattern = r"(?<!\w)" + re.escape(skill) + r"(?!\w)"
+
+        if re.search(pattern, text, re.IGNORECASE):
             found.append(skill)
 
     return found
@@ -72,20 +74,45 @@ def find_skills(text):
 
 def calculate_score(text, skills, email, phone):
     """Calculate a simple transparent resume score out of 100."""
-    score = 0
 
+    score = 0
+    text_lower = text.lower()
+
+    # 1. Contact information - 30 points
     if email != "Not found":
-        score += 20
+        score += 15
 
     if phone != "Not found":
-        score += 20
+        score += 15
 
-    score += min(len(skills) * 4, 40)
+    # 2. Technical skills - 30 points
+    score += min(len(skills) * 3, 30)
 
-    if len(text.split()) >= 150:
-        score += 20
-    elif len(text.split()) >= 75:
+    # 3. Resume sections - 30 points
+    sections = {
+        "Education": r"\beducation\b",
+        "Skills": r"\bskills?\b",
+        "Projects": r"\bprojects?\b",
+        "Experience": r"\bexperience\b",
+        "Certifications": r"\bcertifications?\b",
+        "Achievements": r"\bachievements?\b"
+    }
+
+    sections_found = 0
+
+    for pattern in sections.values():
+        if re.search(pattern, text_lower):
+            sections_found += 1
+
+    score += sections_found * 5
+
+    # 4. Resume length - 10 points
+    word_count = len(text.split())
+
+    if word_count >= 150:
         score += 10
+    elif word_count >= 75:
+        score += 5
 
     return min(score, 100)
 
@@ -98,6 +125,20 @@ def analyze_resume(raw_text):
     phone = extract_phone(text)
     skills = find_skills(text)
     score = calculate_score(text, skills, email, phone)
+    sections = {
+        "Education": r"\beducation\b",
+        "Skills": r"\bskills?\b",
+        "Projects": r"\bprojects?\b",
+        "Experience": r"\bexperience\b",
+        "Certifications": r"\bcertifications?\b",
+        "Achievements": r"\bachievements?\b"
+    }
+
+    detected_sections = []
+
+    for section, pattern in sections.items():
+        if re.search(pattern, text, re.IGNORECASE):
+            detected_sections.append(section)
 
     report = []
     report.append("=" * 55)
@@ -110,6 +151,15 @@ def analyze_resume(raw_text):
     report.append("")
     report.append("Skills detected:")
     report.append("- " + (", ".join(skills) if skills else "No listed skills detected"))
+    
+    report.append("")
+    report.append("Resume Sections:")
+
+    for section in sections:
+        if section in detected_sections:
+            report.append(f"✓ {section}")
+        else:
+            report.append(f"✗ {section}")
     report.append("")
     report.append(f"Resume Score       : {score}/100")
     report.append("")
