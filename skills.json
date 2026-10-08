@@ -1,0 +1,26 @@
+{
+    "Python Developer": [
+        "Python",
+        "Git",
+        "GitHub",
+        "SQL",
+        "REST API",
+        "Django",
+        "Flask"
+    ],
+    "Data Analyst": [
+        "Python",
+        "SQL",
+        "Excel",
+        "Power BI",
+        "Data Analysis"
+    ],
+    "Web Developer": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "Node.js",
+        "Git"
+    ]
+}
