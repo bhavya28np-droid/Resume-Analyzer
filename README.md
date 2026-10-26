@@ -4,7 +4,6 @@ A Python-based Resume Analyzer developed as a Python Mini Project.
 
 ## Project Information
 
-- **Project No.:** 37
 - **Project Title:** Resume Analyzer
 - **Major Python Concepts:** Strings, Regex, File Handling
 - **Language:** Python
